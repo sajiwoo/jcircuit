@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: jcircuit
+  main:
+    banner-mode: CONSOLE
+    lazy-initialization: true
