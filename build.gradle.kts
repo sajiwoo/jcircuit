@@ -1,6 +1,7 @@
 plugins {
     java
     application
+    jacoco
     id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.7.0"
@@ -26,11 +27,16 @@ repositories {
 extra["springCloudVersion"] = "2025.1.2"
 
 dependencies {
+    implementation("org.ehcache:ehcache:3.12.0")
+    implementation("org.hibernate.orm:hibernate-jcache:7.4.2.Final")
     implementation("org.springframework.boot:spring-boot-micrometer-tracing-brave")
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+    // implementation("io.github.resilience4j:resilience4j-spring-boot4:2.4.0")
     implementation("org.springframework.boot:spring-boot-h2console")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("com.h2database:h2")
@@ -55,6 +61,18 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
+}
 spotless {
     kotlinGradle {
         target("*.gradle.kts", "buildSrc/*.gradle.kts", "**/build.gradle.kts")

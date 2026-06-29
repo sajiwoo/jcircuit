@@ -1,6 +1,43 @@
 spring:
   application:
     name: jcircuit
+  reactor:
+    context-propagation: auto
   main:
     banner-mode: CONSOLE
     lazy-initialization: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jcircuit
+    username: postgres
+    password: postgres
+  # datasource:
+  #   url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+  #   username: oracle
+  #   password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # database-platform: org.hibernate.dialect.OracleDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+hibernate:
+  cache:
+    use_second_level_cache: 'true'
+    region:
+      factory_class: org.hibernate.cache.jcache.internal.JCacheRegionFactory
+  javax:
+    cache:
+      uri: ehcache.xml
+      provider: org.ehcache.jsr107.EhcacheCachingProvider
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "metrics,prometheus,health,refresh,circuitbreakers"
+resilience4j.circuitbreaker:
+  instances:
+    backendService:
+      registerHealthIndicator: true
